@@ -1,0 +1,10 @@
+core_tools/xenv/
+venv/
+__pycache__/
+*.db
+logs/
+missions/
+evidence/
+X_DATABASE/MASTER_WORDLISTS/SecLists/
+X_DATABASE/MASTER_WORDLISTS/rockyou.txt
+X_DATABASE/MASTER_WORDLISTS/SecLists/

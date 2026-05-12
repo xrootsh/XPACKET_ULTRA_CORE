@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>X🔴PACKET™ ULTRA | DASHBOARD</title>
+    <script src="https://unpkg.com/force-graph"></script>
+    <style>
+        body { margin: 0; background: #000; color: #ff0000; font-family: 'Courier New', monospace; overflow: hidden; }
+        #stats { position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(0,0,0,0.8); padding: 15px; border: 1px solid #ff0000; box-shadow: 0 0 15px #ff0000; }
+        #header { position: absolute; top: 20px; right: 20px; text-align: right; z-index: 10; }
+        .neon-text { text-shadow: 0 0 10px #ff0000; }
+    </style>
+</head>
+<body>
+    <div id="stats">
+        <h2 class="neon-text">X🔴PACKET™ v131</h2>
+        <p>SYSTEM: ONLINE</p>
+        <p>NODES DETECTED: <span id="node-count">0</span></p>
+    </div>
+    <div id="header">
+        <p class="neon-text">@xrootaccess | OSINT ENGINE</p>
+    </div>
+    <div id="graph"></div>
+
+    <script>
+        async function loadGraph() {
+            try {
+                const response = await fetch('http://localhost:9003/intel/network-graph');
+                const data = await response.json();
+                
+                document.getElementById('node-count').innerText = data.nodes_count;
+
+                const gData = { nodes: [], links: [] };
+                const nodeSet = new Set();
+
+                data.graph.forEach(link => {
+                    if (!nodeSet.has(link.from)) { gData.nodes.push({ id: link.from, group: 1 }); nodeSet.add(link.from); }
+                    if (!nodeSet.has(link.to)) { gData.nodes.push({ id: link.to, group: 2 }); nodeSet.add(link.to); }
+                    gData.links.push({ source: link.from, target: link.to });
+                });
+
+                const Graph = ForceGraph()(document.getElementById('graph'))
+                    .graphData(gData)
+                    .nodeLabel('id')
+                    .nodeAutoColorBy('group')
+                    .linkColor(() => '#ff0000')
+                    .linkDirectionalParticles(2)
+                    .linkDirectionalParticleSpeed(d => 0.01);
+            } catch (err) {
+                console.error("Graph Error:", err);
+            }
+        }
+        loadGraph();
+        setInterval(loadGraph, 5000); // 5 സെക്കൻഡിൽ ഓട്ടോ-റിഫ്രഷ്
+    </script>
+</body>
+</html>
